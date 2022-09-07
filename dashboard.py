@@ -84,7 +84,12 @@ combined_df.drop(["loc_id", "detail_id", "id"], axis=1, inplace=True)
 # create dash app
 dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.VAPOR, dbc_css], title = "👽Aliens in America" , update_title ="🛸🛸🛸...")
+app = dash.Dash(
+    __name__,
+    external_stylesheets=[dbc.themes.VAPOR, dbc_css],
+    title="👽Aliens in America",
+    update_title="🛸🛸🛸...",
+)
 
 # create layout
 app.layout = html.Div(
@@ -107,7 +112,13 @@ app.layout = html.Div(
                         html.Div(
                             dbc.Row(
                                 [
-                                    dbc.Col(ThemeChangerAIO(aio_id="theme", radio_props = {"value":dbc.themes.LUX}), width=2),
+                                    dbc.Col(
+                                        ThemeChangerAIO(
+                                            aio_id="theme",
+                                            radio_props={"value": dbc.themes.LUX},
+                                        ),
+                                        width=2,
+                                    ),
                                     dbc.Col(
                                         html.H3("🛸Alien Sightings Statewise"), width=4
                                     ),
