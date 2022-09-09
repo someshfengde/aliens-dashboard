@@ -11,6 +11,7 @@ import plotly.express as px
 import plotly.io as pio
 from dash_bootstrap_templates import ThemeChangerAIO, template_from_url
 import dash_daq as daq
+import matplotlib.pyplot as plt
 
 #### PREPARE DATA
 # read data
@@ -151,10 +152,13 @@ app.layout = dbc.Container(
                     dcc.Graph(id="type_graph", figure={}),
                     width=6,
                 ),
-                dbc.Col(
-                    html.Div(html.Img(id= "alien_image",src = "data/ufo_image.png"),),
-                    width=4,
-                ),
+                # dbc.Col(
+                #     html.Img(src="https://github.com/someshfengde/aliens-dashboard/blob/master/data/ufo_image.png",
+                #     className="img-fluid hover-image",),
+                #     # dcc.Graph(id="alien_image", figure={}),
+                #     # html.Div(html.Img(id= "alien_image",src = "/home/somesh/Desktop/code/aliens_dash/data/ufo_image.png"),),
+                #     width=4,
+                # ),
 
                 ]
                 ),
@@ -174,7 +178,6 @@ app.layout = dbc.Container(
                     width=6,
                 ),
                 dcc.Graph(id="aliens_per_year_graph", figure={}),
-                html.Div(html.Img(src = "data/ufo_image.png"),),
             ]
         ),
     ],
@@ -300,11 +303,15 @@ def update_aliens_per_year_graph(value, theme):
 
 
 # @app.callback(
-#     dash.dependencies.Output("alien_image", "src"),
-#     dash.dependencies.Input("feed_freq_graph", "figure"),
+#     dash.dependencies.Output("alien_image", "figure"),
+#     dash.dependencies.Input("alien_image", "figure"),
 # )
 # def update_image_src(value):
-
+#     img = plt.imread("/home/somesh/Desktop/code/aliens_dash/data/ufo_image.png")
+#     img_rgb = [[[255, 0, 0], [0, 255, 0], [0, 0, 255]],
+#            [[0, 255, 0], [0, 0, 255], [255, 0, 0]]]
+#     fig = px.imshow(img_rgb)
+#     return fig
 
 # ---------------------RUN APP---------------------
 if __name__ == "__main__":
