@@ -10,7 +10,7 @@ import os
 import plotly.express as px
 import plotly.io as pio
 from dash_bootstrap_templates import ThemeChangerAIO, template_from_url
-
+import dash_daq as daq
 
 #### PREPARE DATA
 # read data
@@ -83,7 +83,7 @@ combined_df.drop(["loc_id", "detail_id", "id"], axis=1, inplace=True)
 #### DASH APP
 # create dash app
 dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
-
+from PIL import Image
 app = dash.Dash(
     __name__,
     external_stylesheets=[dbc.themes.VAPOR, dbc_css],
@@ -92,7 +92,7 @@ app = dash.Dash(
 )
 
 # create layout
-app.layout = html.Div(
+app.layout = dbc.Container(
     [
         dbc.Row(
             [
@@ -140,12 +140,27 @@ app.layout = html.Div(
                     ],
                     width=6,
                 ),
-                html.H3("🛸Which type of Alien Sightings were there?"),
-                html.Div(
+                html.H2("🛸Which type of Alien Sightings were there?"),
+                dbc.Row([
+                    dbc.Col(
+                        daq.ToggleSwitch(id="type_graph_toogle", value=False, label="Histogram graph",
+                        ),
+                    
+                    width=2,),
+                dbc.Col(
                     dcc.Graph(id="type_graph", figure={}),
+                    width=6,
+                ),
+                dbc.Col(
+                    html.Div(html.Img(id= "alien_image",src = "data/ufo_image.png"),),
+                    width=4,
+                ),
+
+                ]
                 ),
             ]
         ),
+        html.Br(),
         dbc.Row(
             [
                 html.H2("🛸How many aliens of selected types appeared in each year?"),
@@ -159,9 +174,12 @@ app.layout = html.Div(
                     width=6,
                 ),
                 dcc.Graph(id="aliens_per_year_graph", figure={}),
+                html.Div(html.Img(src = "data/ufo_image.png"),),
             ]
         ),
-    ]
+    ],
+    fluid=True,
+    className="dbc",
 )
 
 # ---------------------CALLBACKS---------------------
@@ -195,16 +213,33 @@ def update_state_graph(value, theme):
     [
         dash.dependencies.Input("type_graph", "figure"),
         dash.dependencies.Input(ThemeChangerAIO.ids.radio("theme"), "value"),
+        dash.dependencies.Input("type_graph_toogle" , "value")
     ],
 )
-def update_type_graph(value, theme):
-    fig = px.histogram(
-        combined_df,
-        x="type",
-        color="type",
-        title="Alien Sightings by Type",
-        template=template_from_url(theme),
-    )
+def update_type_graph(value, theme, toggle_mode):
+    types_df = pd.DataFrame(columns=["type", "count"])
+    types_df["type"] = combined_df["type"].value_counts().to_dict().keys()
+    types_df["count"] = combined_df["type"].value_counts().to_dict().values()
+    if toggle_mode:
+            fig = px.histogram(
+                combined_df,
+                x="type",
+                color="type",
+                title="Alien Sightings by Type",
+                template=template_from_url(theme),
+                range_y = [8000, 11000],
+            )
+    else:
+        fig = px.pie(
+            types_df,
+            values="count",
+            names="type",
+            hole=0.3,
+            color_discrete_sequence=px.colors.sequential.Plasma,
+            template=template_from_url(theme),
+        )
+
+
     return fig
 
 
@@ -216,12 +251,23 @@ def update_type_graph(value, theme):
     ],
 )
 def update_feed_freq_graph(value, theme):
+    # value_counts_df = pd.DataFrame(columns=["feeding_freq", "count"])
+    # value_counts_df["year"] = selected_df["birth_year"].value_counts().to_dict().keys()
+    # value_counts_df["count"] = (
+    #     selected_df["birth_year"].value_counts().to_dict().values()
+    # )
     fig = px.histogram(
         combined_df,
         x="feeding_frequency",
         template=template_from_url(theme),
+        range_y=[5500, 7000],
     )
+    #
+
+    # fig = px.pie(combined_df, values='count', names='feeding_frequency')
     return fig
+
+
 
 
 @app.callback(
@@ -235,20 +281,29 @@ def update_aliens_per_year_graph(value, theme):
     # selecting the df for reuiqred type
     selected_df = combined_df[combined_df["type"] == value]
     value_counts_df = pd.DataFrame(columns=["year", "count"])
-    value_counts_df["year"] = selected_df["birth_year"].value_counts().to_dict().keys()
-    value_counts_df["count"] = (
-        selected_df["birth_year"].value_counts().to_dict().values()
+    value_counts_df["year"] = (
+        selected_df["birth_year"].value_counts().sort_index().to_dict().keys()
     )
-    fig = px.histogram(
+    value_counts_df["count"] = (
+        selected_df["birth_year"].value_counts().sort_index().to_dict().values()
+    )
+    fig = px.line(
         value_counts_df,
         x="year",
         y="count",
         title=f"Aliens per Year for type {value}",
         color_discrete_sequence=["indianred"],
-        opacity=0.5,
+        # opacity=0.5,
         template=template_from_url(theme),
     )
     return fig
+
+
+# @app.callback(
+#     dash.dependencies.Output("alien_image", "src"),
+#     dash.dependencies.Input("feed_freq_graph", "figure"),
+# )
+# def update_image_src(value):
 
 
 # ---------------------RUN APP---------------------
