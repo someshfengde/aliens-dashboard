@@ -326,4 +326,4 @@ def update_aliens_per_year_graph(value, theme):
 
 # ---------------------RUN APP---------------------
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server()
