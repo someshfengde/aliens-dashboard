@@ -300,15 +300,25 @@ def update_aliens_per_year_graph(value, theme):
     value_counts_df["count"] = (
         selected_df["birth_year"].value_counts().sort_index().to_dict().values()
     )
+    max_count_val = value_counts_df.max()["count"]
+    scatter_df = value_counts_df.query(f"count == {max_count_val}")
+
     fig = px.line(
         value_counts_df,
         x="year",
         y="count",
-        title=f"👽️ per Year for type {value}",
-        color_discrete_sequence=["indianred"],
+        title=f"👽️ per Year for type {value}", 
+        # color_discrete_sequence=["green"],
         # opacity=0.5,
         template=template_from_url(theme),
     )
+    fig.add_traces(
+        go.Scatter(
+
+            x=scatter_df["year"], y=scatter_df["count"], mode="markers", name = "maximum count"
+            )
+    )
+
     return fig
 
 
