@@ -94,8 +94,7 @@ app = dash.Dash(
 
 # create layout
 app.layout = dbc.Container(
-    [
-        dbc.Row(
+        [dbc.Row(
             [
                 dbc.Col(
                     html.H1(
@@ -107,8 +106,7 @@ app.layout = dbc.Container(
             ]
         ),
         dbc.Row(
-            [
-                dbc.Col(
+                [dbc.Col(
                     [
                         html.Div(
                             dbc.Row(
@@ -132,15 +130,11 @@ app.layout = dbc.Container(
                 ),
                 dbc.Col(
                     [
-                        html.Div(
-                            [
-                                html.H3("🛸How often do aliens feed?"),
-                                dcc.Graph(id="feed_freq_graph", figure={}),
-                            ]
-                        )
+                    html.H3("🛸What's the gender of Aliens?"),
+                    dcc.Graph(id = "gender_pie")
                     ],
                     width=6,
-                ),
+                )]),
                 html.H2("🛸Which type of Alien Sightings were there?"),
                 dbc.Row([
                     dbc.Col(
@@ -152,18 +146,13 @@ app.layout = dbc.Container(
                     dcc.Graph(id="type_graph", figure={}),
                     width=6,
                 ),
-                # dbc.Col(
-                #     html.Img(src="https://github.com/someshfengde/aliens-dashboard/blob/master/data/ufo_image.png",
-                #     className="img-fluid hover-image",),
-                #     # dcc.Graph(id="alien_image", figure={}),
-                #     # html.Div(html.Img(id= "alien_image",src = "/home/somesh/Desktop/code/aliens_dash/data/ufo_image.png"),),
-                #     width=4,
-                # ),
-
-                ]
+                dbc.Col(
+                    html.Img(src='assets/ufo-green.gif'),
+                    width=4,
                 ),
-            ]
-        ),
+                ]
+                )
+        ,
         html.Br(),
         dbc.Row(
             [
@@ -180,7 +169,16 @@ app.layout = dbc.Container(
                 dcc.Graph(id="aliens_per_year_graph", figure={}),
             ]
         ),
-    ],
+        dbc.Row(
+                [
+                    html.Div(
+                            [
+                                html.H3("🛸How often do aliens feed?"),
+                                dcc.Graph(id="feed_freq_graph", figure={}),
+                            ]
+                        )
+                ]
+        ),],
     fluid=True,
     className="dbc",
 )
@@ -202,12 +200,30 @@ def update_state_graph(value, theme):
         value_count_df,
         scope="usa",
         locationmode="USA-states",
+        title=  "Texas has highest no of 👽️ sightings." ,
         locations="state",
         color="count",
         hover_name="state",
         color_discrete_sequence=px.colors.sequential.Plasma,
         template=template_from_url(theme),
     )
+    return fig
+
+@app.callback(
+    dash.dependencies.Output("gender_pie" ,"figure"),
+    [
+        dash.Input(ThemeChangerAIO.ids.radio("theme"), "value")
+    ]
+    )
+def update_gender_graph(theme):
+    new_df = pd.DataFrame(columns = ["Gender" , "Count"])
+    new_df["Gender"] = combined_df.gender.value_counts().to_dict().keys()
+    new_df["Count"] = combined_df.gender.value_counts().to_dict().values()
+    fig = px.pie(new_df ,names = "Gender" , values = "Count",
+            title = "There are lot of Female aliens 👯‍♀️" , 
+            # color_discrete_sequence = px.colors.sequential.Plasma, 
+            hole = 0.3,
+            template = template_from_url(theme))
     return fig
 
 
@@ -228,7 +244,7 @@ def update_type_graph(value, theme, toggle_mode):
                 combined_df,
                 x="type",
                 color="type",
-                title="Alien Sightings by Type",
+                title="👽️ Alien Sightings histogram by Type",
                 template=template_from_url(theme),
                 range_y = [8000, 11000],
             )
@@ -237,6 +253,7 @@ def update_type_graph(value, theme, toggle_mode):
             types_df,
             values="count",
             names="type",
+            title = "there are almost same % of 👽️ of each type" , 
             hole=0.3,
             color_discrete_sequence=px.colors.sequential.Plasma,
             template=template_from_url(theme),
@@ -254,20 +271,13 @@ def update_type_graph(value, theme, toggle_mode):
     ],
 )
 def update_feed_freq_graph(value, theme):
-    # value_counts_df = pd.DataFrame(columns=["feeding_freq", "count"])
-    # value_counts_df["year"] = selected_df["birth_year"].value_counts().to_dict().keys()
-    # value_counts_df["count"] = (
-    #     selected_df["birth_year"].value_counts().to_dict().values()
-    # )
     fig = px.histogram(
         combined_df,
         x="feeding_frequency",
+        title = "👽️ feeding frequency." , 
         template=template_from_url(theme),
         range_y=[5500, 7000],
     )
-    #
-
-    # fig = px.pie(combined_df, values='count', names='feeding_frequency')
     return fig
 
 
@@ -294,7 +304,7 @@ def update_aliens_per_year_graph(value, theme):
         value_counts_df,
         x="year",
         y="count",
-        title=f"Aliens per Year for type {value}",
+        title=f"👽️ per Year for type {value}",
         color_discrete_sequence=["indianred"],
         # opacity=0.5,
         template=template_from_url(theme),
@@ -302,16 +312,7 @@ def update_aliens_per_year_graph(value, theme):
     return fig
 
 
-# @app.callback(
-#     dash.dependencies.Output("alien_image", "figure"),
-#     dash.dependencies.Input("alien_image", "figure"),
-# )
-# def update_image_src(value):
-#     img = plt.imread("/home/somesh/Desktop/code/aliens_dash/data/ufo_image.png")
-#     img_rgb = [[[255, 0, 0], [0, 255, 0], [0, 0, 255]],
-#            [[0, 255, 0], [0, 0, 255], [255, 0, 0]]]
-#     fig = px.imshow(img_rgb)
-#     return fig
+
 
 # ---------------------RUN APP---------------------
 if __name__ == "__main__":
