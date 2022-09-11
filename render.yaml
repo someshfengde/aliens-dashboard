@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: mysite
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "web: gunicorn dashboard:server"

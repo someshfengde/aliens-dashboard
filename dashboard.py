@@ -84,13 +84,17 @@ combined_df.drop(["loc_id", "detail_id", "id"], axis=1, inplace=True)
 #### DASH APP
 # create dash app
 dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
-from PIL import Image
+
+
 app = dash.Dash(
     __name__,
     external_stylesheets=[dbc.themes.VAPOR, dbc_css],
     title="👽Aliens in America",
     update_title="🛸🛸🛸...",
 )
+
+server = app.server
+
 
 # create layout
 app.layout = dbc.Container(
