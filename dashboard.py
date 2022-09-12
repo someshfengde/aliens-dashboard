@@ -92,6 +92,8 @@ app = dash.Dash(
     update_title="🛸🛸🛸...",
 )
 
+server = app.server
+
 # create layout
 app.layout = dbc.Container(
         [dbc.Row(
