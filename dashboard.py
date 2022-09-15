@@ -87,7 +87,7 @@ dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.mi
 from PIL import Image
 app = dash.Dash(
     __name__,
-    external_stylesheets=[dbc.themes.VAPOR, dbc_css],
+    external_stylesheets=[dbc.themes.LUX, dbc_css],
     title="👽Aliens in America",
     update_title="🛸🛸🛸...",
 )
